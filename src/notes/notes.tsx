@@ -24,3 +24,7 @@ export const notes: Note[] = [
     date: new Date(2024, 3, 25),
   },
 ];
+
+const currentNotes = localStorage.getItem("notes");
+
+if (!currentNotes) localStorage.setItem("notes", JSON.stringify(notes));
