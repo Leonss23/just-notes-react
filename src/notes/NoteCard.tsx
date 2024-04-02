@@ -12,7 +12,7 @@ export default function NoteCard({ note }: Props) {
       <div className="flex content-evenly items-center justify-between gap-6">
         <p className="text-2xl">{note.title}</p>
         <p className="text-sm text-neutral-500">
-          {note.date.toLocaleDateString()}
+          {new Date(note.date).toLocaleDateString()}
         </p>
       </div>
       <p>{note.content}</p>
