@@ -1,49 +1,66 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Note } from "./notes";
 
 type Props = {
-  note: Note;
+  notes: Note[];
+  setNotes: React.Dispatch<React.SetStateAction<Note[]>>;
+  active: number;
 };
 
-export default function NoteEditor(props: Props) {
-  const [note, setNote] = useState(props.note);
+export default function NoteEditor({ notes, setNotes, active }: Props) {
+  const getActiveNote = () => notes.find((n) => n.id === active) as Note;
 
-  const onNoteChange = (newNote: Note) => { 
-    const notes = JSON.parse(localStorage.getItem("notes") || "") as Note[]
-    
-    const filteredNotes = notes.filter(el => el.id !== newNote.id) as Note[]
+  const [note, setNote] = useState<Note>(getActiveNote());
 
-    console.log([...filteredNotes, newNote])
-    
-    setNote(newNote)
+  useEffect(() => {
+    //
+    setNote(getActiveNote());
+  }, [active, notes]);
 
-    localStorage.setItem("notes", JSON.stringify([...filteredNotes, newNote]))
+  useEffect(() => {
+    console.log({ title: note.title });
 
-    console.log("Note successfully saved!")
-  }
+    // update notes when note is updated
+    setNotes((n) => {
+      const filteredNotes = n.filter((n) => n.id !== active);
+      return [...filteredNotes, note];
+    });
+  }, [note]);
+
+  // useEffect(() => {
+  //   const filteredNotes = notes.filter((n) => n.id !== active);
+  //   const updatedNote: Note = { ...note, content, title };
+  //
+  //   setNotes([...filteredNotes, updatedNote]);
+  // }, []);
+
+  // const onNoteChange = (newNote: Note) => {
+  //   const notes = JSON.parse(localStorage.getItem("notes") || "") as Note[];
+  //   const filteredNotes = notes.filter((el) => el.id !== newNote.id) as Note[];
+  //   console.log([...filteredNotes, newNote]);
+  //   setNote(newNote);
+  //   localStorage.setItem("notes", JSON.stringify([...filteredNotes, newNote]));
+  //   console.log("Note successfully saved!");
+  // };
 
   return (
     <div className="flex justify-center">
-      <div className="container flex flex-col px-20 py-4">
+      <div
+        className="container flex flex-col px-20 py-4"
+        contentEditable
+        suppressContentEditableWarning
+      >
         <h1
-          contentEditable
-          suppressContentEditableWarning
           className="text-4xl"
-          onBlur={(e) => {
-            const { target } = e;
-
-            console.log("Event: ", e)
-            const title = (target as HTMLHeadingElement).textContent || ""
-
-            onNoteChange({ ...note, title: title })
-          }}
+          // onBlur={(e) => setTitle(e.target.innerText)}
         >
           {note.title}
         </h1>
         <p
-          contentEditable
-          suppressContentEditableWarning
-        >{note.content}</p>
+        // onBlur={(e) => setContent(e.target.innerText)}
+        >
+          {note.content}
+        </p>
       </div>
     </div>
   );
